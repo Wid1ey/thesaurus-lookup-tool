@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thesaurus Lookup Tool</title>
+    <meta name="description" content="Quick and easy thesaurus lookup tool for writers, students, and professionals">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        #wordInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        #wordInput:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 25px rgba(74, 85, 104, 0.3);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .history-section {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .history-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .history-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .status-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .status-info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #7cc7f7;
+        }
+
+        .keyboard-shortcuts {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .keyboard-shortcuts h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .key-combo {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-wrapper {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation for successful actions */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Thesaurus Lookup</h1>
+        <p class="subtitle">Find synonyms and antonyms with Merriam-Webster</p>
+        
+        <div class="search-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="wordInput" 
+                    placeholder="Enter a word or phrase..."
+                    autocomplete="off"
+                    spellcheck="true"
+                >
+                <button class="btn" onclick="lookupWord()">
+                    🔍 Lookup
+                </button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="useClipboard()">
+                📋 Use Clipboard
+            </button>
+            <button class="btn btn-secondary" onclick="copyURL()">
+                🔗 Copy URL
+            </button>
+            <button class="btn btn-secondary" onclick="clearHistory()">
+                🗑️ Clear History
+            </button>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <div class="history-section" id="historySection" style="display: none;">
+            <div class="history-title">
+                <span>📖 Recent Lookups</span>
+                <span id="historyCount" style="font-size: 0.8rem; color: #718096;"></span>
+            </div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+
+        <div class="keyboard-shortcuts">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="shortcut-item">
+                <span>Quick lookup:</span>
+                <span class="key-combo">Enter</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Clear input:</span>
+                <span class="key-combo">Esc</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Focus input:</span>
+                <span class="key-combo">Ctrl + /</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Production-ready thesaurus lookup implementation
+        class ThesaurusLookup {
+            constructor() {
+                this.baseURL = "https://www.merriam-webster.com/thesaurus/";
+                this.searchHistory = this.loadHistory();
+                this.maxHistoryItems = 20;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateHistoryDisplay();
+                this.focusInput();
+            }
+
+            setupEventListeners() {
+                const input = document.getElementById('wordInput');
+                
+                // Enter key for lookup
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.lookupWord();
+                    } else if (e.key === 'Escape') {
+                        this.clearInput();
+                    }
+                });
+
+                // Global keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === '/') {
+                        e.preventDefault();
+                        this.focusInput();
+                    }
+                });
+
+                // Input validation and formatting
+                input.addEventListener('input', (e) => {
+                    this.validateInput(e.target);
+                });
+
+                // Auto-focus when clicking anywhere in container
+                document.querySelector('.container').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        this.focusInput();
+                    }
+                });
+            }
+
+            validateInput(input) {
+                // Remove multiple spaces and trim
+                let value = input.value;
+                value = value.replace(/\s+/g, ' ').substring(0, 100); // Limit length
+                
+                if (value !== input.value) {
+                    input.value = value;
+                }
+            }
+
+            sanitizeSearchTerm(term) {
+                if (!term || typeof term !== 'string') {
+                    throw new Error('Invalid search term provided');
+                }
+
+                // Comprehensive cleaning and validation
+                let cleaned = term
+                    .trim()                           // Remove leading/trailing whitespace
+                    .replace(/\s+/g, ' ')            // Normalize multiple spaces
+                    .replace(/[^\w\s\-']/g, '')      // Keep only letters, numbers, spaces, hyphens, apostrophes
+                    .toLowerCase();                   // Normalize case
+
+                // Validate length
+                if (cleaned.length === 0) {
+                    throw new Error('Search term cannot be empty');
+                }
+                
+                if (cleaned.length > 100) {
+                    throw new Error('Search term too long (max 100 characters)');
+                }
+
+                // Additional validation for edge cases
+                if (/^\s*[-']+\s*$/.test(cleaned)) {
+                    throw new Error('Search term must contain letters or numbers');
+                }
+
+                return cleaned;
+            }
+
+            createThesaurusURL(searchTerm) {
+                try {
+                    const sanitized = this.sanitizeSearchTerm(searchTerm);
+                    const encoded = encodeURIComponent(sanitized);
+                    return this.baseURL + encoded;
+                } catch (error) {
+                    throw new Error(`URL creation failed: ${error.message}`);
+                }
+            }
+
+            lookupWord(term = null) {
+                try {
+                    const searchTerm = term || document.getElementById('wordInput').value;
+                    
+                    if (!searchTerm?.trim()) {
+                        this.showStatus('Please enter a word or phrase to look up', 'error');
+                        this.focusInput();
+                        return;
+                    }
+
+                    const url = this.createThesaurusURL(searchTerm);
+                    
+                    // Add to history before opening
+                    this.addToHistory(searchTerm.trim());
+                    
+                    // Open URL
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                    
+                    // Show success message
+                    this.showStatus(`Looking up "${searchTerm.trim()}" in thesaurus`, 'success');
+                    
+                    // Clear input for next lookup
+                    document.getElementById('wordInput').value = '';
+                    
+                    // Add visual feedback
+                    document.querySelector('.btn').classList.add('pulse');
+                    setTimeout(() => {
+                        document.querySelector('.btn').classList.remove('pulse');
+                    }, 300);
+
+                } catch (error) {
+                    console.error('Lookup error:', error);
+                    this.showStatus(error.message, 'error');
+                }
+            }
+
+            async useClipboard() {
+                try {
+                    // Check if clipboard API is available
+                    if (!navigator.clipboard) {
+                        throw new Error('Clipboard access not available in this browser');
+                    }
+
+                    const clipboardText = await navigator.clipboard.readText();
+                    
+                    if (!clipboardText?.trim()) {
+                        this.showStatus('Clipboard is empty', 'error');
+                        return;
+                    }
+
+                    // Validate clipboard content
+                    const sanitized = this.sanitizeSearchTerm(clipboardText);
+                    document.getElementById('wordInput').value = sanitized;
+                    
+                    this.showStatus(`Loaded "${sanitized}" from clipboard`, 'info');
+                    this.focusInput();
+
+                } catch (error) {
+                    console.error('Clipboard error:', error);
+                    if (error.name === 'NotAllowedError') {
+                        this.showStatus('Clipboard access denied. Please grant permission or paste manually.', 'error');
+                    } else {
+                        this.showStatus(`Clipboard error: ${error.message}`, 'error');
+                    }
+                }
+            }
+
+            async copyURL() {
+                try {
+                    const searchTerm = document.getElementById('wordInput').value;
+                    
+                    if (!searchTerm?.trim()) {
+                        this.showStatus('Enter a word first to copy its thesaurus URL', 'error');
+                        this.focusInput();
+                        return;
+                    }
+
+                    const url = this.createThesaurusURL(searchTerm);
+                    
+                    if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(url);
+                        this.showStatus(`URL copied: ${url}`, 'success');
+                    } else {
+                        // Fallback for older browsers
+                        this.fallbackCopyToClipboard(url);
+                        this.showStatus(`URL copied (fallback method)`, 'success');
+                    }
+
+                    this.addToHistory(searchTerm.trim());
+
+                } catch (error) {
+                    console.error('Copy error:', error);
+                    this.showStatus(`Copy failed: ${error.message}`, 'error');
+                }
+            }
+
+            fallbackCopyToClipboard(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                } finally {
+                    document.body.removeChild(textArea);
+                }
+            }
+
+            addToHistory(term) {
+                // Avoid duplicates and maintain order
+                this.searchHistory = this.searchHistory.filter(item => 
+                    item.toLowerCase() !== term.toLowerCase()
+                );
+                
+                this.searchHistory.unshift(term);
+                
+                // Limit history size
+                if (this.searchHistory.length > this.maxHistoryItems) {
+                    this.searchHistory = this.searchHistory.slice(0, this.maxHistoryItems);
+                }
+                
+                this.saveHistory();
+                this.updateHistoryDisplay();
+            }
+
+            updateHistoryDisplay() {
+                const historySection = document.getElementById('historySection');
+                const historyList = document.getElementById('historyList');
+                const historyCount = document.getElementById('historyCount');
+                
+                if (this.searchHistory.length === 0) {
+                    historySection.style.display = 'none';
+                    return;
+                }
+
+                historySection.style.display = 'block';
+                historyCount.textContent = `(${this.searchHistory.length})`;
+                
+                historyList.innerHTML = '';
+                
+                this.searchHistory.forEach(term => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.textContent = term;
+                    item.setAttribute('title', `Click to lookup "${term}"`);
+                    item.onclick = () => {
+                        document.getElementById('wordInput').value = term;
+                        this.lookupWord(term);
+                    };
+                    historyList.appendChild(item);
+                });
+            }
+
+            clearHistory() {
+                if (this.searchHistory.length === 0) {
+                    this.showStatus('History is already empty', 'info');
+                    return;
+                }
+
+                if (confirm('Clear all search history?')) {
+                    this.searchHistory = [];
+                    this.saveHistory();
+                    this.updateHistoryDisplay();
+                    this.showStatus('Search history cleared', 'success');
+                }
+            }
+
+            saveHistory() {
+                try {
+                    // Use in-memory storage only - no localStorage for Claude.ai compatibility
+                    // In a real deployment, you would use localStorage here
+                    // localStorage.setItem('thesaurusHistory', JSON.stringify(this.searchHistory));
+                } catch (error) {
+                    console.warn('Could not save history:', error);
+                }
+            }
+
+            loadHistory() {
+                try {
+                    // Use in-memory storage only - no localStorage for Claude.ai compatibility
+                    // In a real deployment, you would load from localStorage here
+                    // const saved = localStorage.getItem('thesaurusHistory');
+                    // return saved ? JSON.parse(saved) : [];
+                    return [];
+                } catch (error) {
+                    console.warn('Could not load history:', error);
+                    return [];
+                }
+            }
+
+            showStatus(message, type = 'info') {
+                const statusDiv = document.getElementById('statusMessage');
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.style.opacity = '1';
+
+                // Auto-hide after 4 seconds
+                setTimeout(() => {
+                    statusDiv.style.opacity = '0';
+                }, 4000);
+            }
+
+            clearInput() {
+                document.getElementById('wordInput').value = '';
+                this.focusInput();
+                this.showStatus('Input cleared', 'info');
+            }
+
+            focusInput() {
+                const input = document.getElementById('wordInput');
+                input.focus();
+                input.select();
+            }
+
+            // Test mode for development
+            runTests() {
+                const testCases = [
+                    'happy',
+                    'state of mind',
+                    'well-being',
+                    'twenty-first',
+                    "can't",
+                    'résumé',
+                    'naïve',
+                    '  multiple   spaces  ',
+                    'special@#$chars',
+                    ''
+                ];
+
+                console.log('🧪 Running URL generation tests...');
+                
+                testCases.forEach(testCase => {
+                    try {
+                        const url = this.createThesaurusURL(testCase);
+                        console.log(`✅ "${testCase}" → ${url}`);
+                    } catch (error) {
+                        console.log(`❌ "${testCase}" → ${error.message}`);
+                    }
+                });
+            }
+        }
+
+        // Global functions for HTML onclick handlers
+        let thesaurusApp;
+
+        function lookupWord() {
+            thesaurusApp.lookupWord();
+        }
+
+        function useClipboard() {
+            thesaurusApp.useClipboard();
+        }
+
+        function copyURL() {
+            thesaurusApp.copyURL();
+        }
+
+        function clearHistory() {
+            thesaurusApp.clearHistory();
+        }
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            thesaurusApp = new ThesaurusLookup();
+            
+            // Uncomment for development testing
+            // thesaurusApp.runTests();
+        });
+
+        // Service Worker registration for PWA capabilities (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Note: You would need to create a service-worker.js file for this
+                // navigator.serviceWorker.register('/service-worker.js');
+            });
+        }
+    </script>
+</body>
+</html>
